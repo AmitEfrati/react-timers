@@ -1,1 +1,1 @@
-export { TimersList } from "./TimersList";
+export * from "./TimersList";

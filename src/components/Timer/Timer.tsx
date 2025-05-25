@@ -1,18 +1,17 @@
 import { useCallback } from "react";
-import { useTimerContext } from "../../context/timers.context";
+import { useTimersContext } from "../../context/timers.context";
 import { useStyle } from "./style";
+import type { TTimer } from "../../context/timers.context";
 
 type TTimerProps = {
-  id: number;
-  seconds: number;
-  milliseconds: number;
-  isRunning: boolean;
+  timer: TTimer;
 };
 
-export function Timer({ id, seconds, isRunning }: TTimerProps) {
+export function Timer({ timer }: TTimerProps) {
+  const { id, seconds, milliseconds, isRunning } = timer;
   const {
     actions: { deleteTimer, toggleRunning, resetTimer },
-  } = useTimerContext();
+  } = useTimersContext();
 
   const classes = useStyle();
 
@@ -31,7 +30,7 @@ export function Timer({ id, seconds, isRunning }: TTimerProps) {
   return (
     <div className={classes.timerBox}>
       <p>
-        Timer #{id}: {seconds}s
+        Timer #{id}: {seconds}s {milliseconds}
       </p>
       <button className={classes.button} onClick={handleToggle}>
         {isRunning ? "Pause" : "Start"}
