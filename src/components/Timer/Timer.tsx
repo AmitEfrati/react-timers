@@ -30,7 +30,7 @@ export function Timer({ timer }: TTimerProps) {
   return (
     <div className={classes.timerBox}>
       <p>
-        Timer #{id}: {seconds}s {milliseconds}
+        Timer #{id}: {seconds}.{String(milliseconds).padStart(3, "0")}s
       </p>
       <button className={classes.button} onClick={handleToggle}>
         {isRunning ? "Pause" : "Start"}

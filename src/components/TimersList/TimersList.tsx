@@ -30,9 +30,12 @@ export function TimersList() {
       <button className={classes.addButton} onClick={addTimer}>
         Add Timer
       </button>
-      {timers.map((timer) => (
-        <Timer key={timer.id} timer={timer} />
-      ))}
+      {timers
+        .valueSeq()
+        .toArray()
+        .map((timer) => (
+          <Timer key={timer.id} timer={timer} />
+        ))}
     </div>
   );
 }

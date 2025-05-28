@@ -4,6 +4,7 @@ import {
     useRef,
   } from "react";
   import createContext from "constate";
+  import { Map } from "immutable";
 
 
   export type TTimer = {
@@ -16,69 +17,55 @@ import {
 
 
   function useTimers() {
-    const [timers, setTimers] = useState<TTimer[]>([])
+    const [timers, setTimers] = useState<Map<number, TTimer>>(Map());
+
     const nextTimerIdRef = useRef(1)
 
-    const getTimerIndexById = useCallback((timers: TTimer[], id: number): number => {
-        return timers.findIndex((timer) => timer.id === id)
-    },[]);
-
     const addTimer = useCallback(() => {
-        const newTimer: TTimer = {
-          id: nextTimerIdRef.current,
-          seconds: 0,
-          milliseconds: 0,
-          isRunning: false,
-          lastUpdate: undefined
-        }
-        nextTimerIdRef.current += 1;
+      const id = nextTimerIdRef.current;
+      const newTimer: TTimer = {
+        id,
+        seconds: 0,
+        milliseconds: 0,
+        isRunning: false,
+        lastUpdate: undefined
+      }
+      nextTimerIdRef.current += 1;
     
-        setTimers((prev) => [...prev, newTimer])
+      setTimers((prev) => prev.set(id, newTimer))
       }, []);
     
       const deleteTimer = useCallback((idToDelete: number) => {
-        setTimers((prev) => {
-            const index = getTimerIndexById(prev, idToDelete);
-            if(index === -1) return prev;
-
-            const updated = [...prev]
-            updated.splice(index, 1);
-            return updated;
-        })
+        setTimers((prev) => prev.delete(idToDelete))
       }, []);
     
       const toggleRunning = useCallback((id: number) => {
         setTimers((prev) => {
-            const index = getTimerIndexById(prev, id);
-            if(index === -1) return prev;
+          const timer = prev.get(id);
+          if(!timer) return prev;
 
-            const updated = [...prev]
-            const timer = updated[index]
-
-    
-            updated[index] = {
+            const updated: TTimer = {
                 ...timer,
                 isRunning: !timer.isRunning,
                 lastUpdate: !timer.isRunning ? Date.now() : timer.lastUpdate,
             }
-            return updated;
-      });
+            return prev.set(id, updated)
+        });
       }, []);
     
       const resetTimer = useCallback((id: number) => {
         setTimers((prev) => {
-            const index = getTimerIndexById(prev, id);
-            if(index === -1) return prev;
+            const timer = prev.get(id);
+            if(!timer) return prev;
 
-            const updated = [...prev]
-            updated[index] = {
-                ...updated[index],
-                seconds: 0,
-                milliseconds: 0,
-                isRunning: false,
-                lastUpdate: undefined,
-            }
-            return updated;
+            const updated: TTimer = {
+              ...timer,
+              seconds: 0,
+              milliseconds:0,
+              isRunning: false,
+              lastUpdate: undefined,
+            };
+            return prev.set(id, updated)
       });
       }, []);
 
